@@ -8,7 +8,7 @@ DHT dht(DHTPIN, DHTTYPE);
 #define PUMP1 10
 #define PUMP2 11
 
-
+#define DISTANCE_CALCULATION (29.387 / 2)
 #define SQUARE_CAPACITY_BASE (L_LENGTH * H_HEIGHT * W_WIDTH)/1000000 // 사각형 수조 용량 계산식
 #define L_LENGTH 50.0 // 사각형 수조 – 세로 (cm)
 #define H_HEIGHT 100.0 // 사각형 수조 – 높이 (cm)
@@ -88,7 +88,7 @@ long read_height() {
   delayMicroseconds(10);
   digitalWrite(TRIG, LOW);
   float distance = pulseIn(ECHO, HIGH);
-  distance = distance / 29.387 / 2;
+  distance = distance / DISTANCE_CALCULATION;
   Serial.print("Sensor Real Distance : ");
   Serial.print(distance);
   Serial.println("cm");
@@ -96,8 +96,10 @@ long read_height() {
   delay(20);
   hWaterCm = H_HEIGHT - distance + DISTANCE_PLUS;
   if (hWaterCm < 0)
-    return 0; if (hWaterCm > H_HEIGHT)
-    return H_HEIGHT; return hWaterCm;
+    return 0;
+  if (hWaterCm > H_HEIGHT)
+    return H_HEIGHT;
+  return hWaterCm;
 }
 
 int check_alarm(int hWaterCm) {
