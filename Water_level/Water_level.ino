@@ -1,7 +1,7 @@
-#include <DHT.h>
-#define DHTPIN 2
-#define DHTTYPE DHT22
-DHT dht(DHTPIN, DHTTYPE);
+
+#include <SHTSensor.h>
+
+SHTSensor sht;
 
 #define TRIG 8
 #define ECHO 9
@@ -21,6 +21,13 @@ DHT dht(DHTPIN, DHTTYPE);
 void setup()
 {
   Serial.begin(9600);
+  delay(1000);
+  if(sht.init()){
+    Serial.print("init() : succes\n");
+  }else{
+    Serial.print("init(): failed\n");
+  }
+  sht.setAccuracy(SHTSensor::SHT_ACCURACY_MEDIUM);
   pinMode(TRIG, OUTPUT);
   pinMode(ECHO, INPUT);
   pinMode(PUMP1, OUTPUT);
@@ -42,8 +49,12 @@ void loop()
     }
   }
 
-  int h = dht.readHumidity();
-  int t = dht.readTemperature();
+  float h = sht.getHumidity();
+  float t = sht.getTemperature();
+  Serial.print(h);
+  Serial.println("%");
+  Serial.print(t);
+  Serial.println("C");
   long hWaterCm;
   int liters;
 
