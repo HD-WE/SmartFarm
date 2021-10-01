@@ -2,65 +2,59 @@
  * 수경 재배기의 코드입니다
  * 수경 재배기의 펌프, 조명, 화분 조명을 제어 하는 코드이다.
  * 라즈베리파이와의 시리얼 통신을 가지고 라즈베리파이에서
- * 신호가 오는 것을 받아 각자의 동작을 토글 방식으로 받는다.
  */
 
 
-#define LED 10        
-#define BIGLED 11
+#define LED1 10
+#define LED2 11
 #define PUMP 12
+#define BIGLED 13
 
 void setup() {
   Serial.begin(9600);
-  pinMode(LED, OUTPUT);
+  pinMode(LED1, OUTPUT);
+  pinMode(LED2, OUTPUT);
   pinMode(BIGLED, OUTPUT);
   pinMode(PUMP, OUTPUT);
+  digitalWrite(LED1, LOW);
+  digitalWrite(LED2, LOW);
+  digitalWrite(BIGLED, LOW);
+  digitalWrite(PUMP, LOW);
+  Serial.flush();
 }
 
-int ledst = 0;  //각각의 토글형식의 상태
-int bigledst = 0;
-int pumpst = 0;
-char ch;  //라즈베리파이에서 시리얼 통신 저장
 
 void loop() {
-  if (Serial.available()) {     //시리얼 정보가 들어온다면
-    ch = Serial.read();       //시리얼 정보 저장
-    if (ch == "LED") {        //LED, BIGLED, PUMP 신호
-      if (ledst == 1) {
-        digitalWrite(LED, HIGH);   //토글 형식  ON OFF
-        delay(500);
-        ledst = 0;
-      } else if (ledst == 0) {
-        digitalWrite(LED, LOW);
-        delay(500);
-        ledst = 1;
-      }
 
+  Serial.flush();
+  String ch = "";
 
-    }
-    if (ch == "BIGLED") {
-      if (bigledst == 1) {
-        digitalWrite(BIGLED, HIGH);
-        delay(500);
-        bigledst = 0;
-      } else if (bigledst == 0) {
-        digitalWrite(BIGLED, LOW);
-        delay(500);
-        bigledst = 1;
-      }
-    }
-    if (ch == "PUMP") {
-      if (pumpst == 1) {
-        digitalWrite(PUMP, HIGH);
-        delay(500);
-        pumpst = 0;
-      } else if (pumpst == 0) {
-        digitalWrite(PUMP, LOW);
-        delay(500);
-        pumpst = 1;
-      }
-    }
+  // 시리얼 통신으로 문자를 입력하기 위한 준비를 합니다.
+  while (Serial.available() > 0)// 시리얼 입력이 있을때
+  {
+    ch += (char) Serial.read(); // 한번에 한문자를 읽으면
+    delay(5); // 5밀리초 동안 대기하고 다음 문자를 읽을 준비를 합니다.
   }
-
+  if (ch == "LEDON\n") {
+    digitalWrite(LED1, HIGH);
+    digitalWrite(LED2, HIGH);
+    delay(500);
+  } else if (ch == "LEDOFF\n") {
+    digitalWrite(LED1, LOW);
+    digitalWrite(LED2, LOW);
+    delay(500);
+  }else if (ch == "BIGON\n") {
+    digitalWrite(BIGLED, HIGH);
+    delay(500);
+  } else if (ch == "BIGOFF\n") {
+    digitalWrite(BIGLED, LOW);
+    delay(500);
+  }else if (ch == "WATERON\n") {
+    digitalWrite(PUMP, HIGH);
+    delay(500);
+  } else if (ch == "WATEROFF\n") {
+    digitalWrite(PUMP, LOW);
+    delay(500);
+  }
 
 }
