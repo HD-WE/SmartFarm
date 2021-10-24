@@ -1,4 +1,3 @@
-from sqlite3.dbapi2 import connect
 from flask import Flask, request, jsonify
 import sqlite3
 
